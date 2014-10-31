@@ -16,7 +16,7 @@ LIBDIR = lib
 LINKER_SCRIPT = linker_script
 
 # These are all the local project source files
-SRCS = $(SRCDIR)/systick_context_switcher.c $(SRCDIR)/sys_clk_init.c
+SRCS = $(addprefix $(SRCDIR)/, systick_context_switcher.c sys_clk_init.c motor.c)
 LIBS := $(LIBDIR)/libtasks.a
 ELF := $(BINDIR)/systick_context_switcher.elf
 
