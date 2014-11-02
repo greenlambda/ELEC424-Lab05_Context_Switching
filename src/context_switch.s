@@ -10,6 +10,7 @@
 .cpu cortex-m3
 .fpu softvfp
 .thumb
+.align  2
 
 .text
 
@@ -19,6 +20,7 @@
  *
  * extern int stack_switch(int (*thread)(void), void* new_stack_top);
  */
+.thumb_func
 .global		stack_switch
 stack_switch:
 	PUSH	{lr}
@@ -48,6 +50,7 @@ ThreadExitReturn:
 /* Return to the function */
 	POP	{lr}
 	BX	lr
+	.size	stack_switch, .-stack_switch
 
 
 /* TODO: Remove me! */
@@ -58,23 +61,55 @@ ThreadExitReturn:
  *
  * void SysTick_Handler();
  */
- // TODO: Why you no work!!! :C
+/* Declare this a thumb_func to make sure the hardware jumps to an odd address */
+.thumb_func
 .global SysTick_Handler
 SysTick_Handler:
-	BX lr
 /*
  * We have just pushed all of the hardware exception stack frame, now push the software
  * exception stack frame.
  */
-//	PUSH {r4-r11}
-/* TODO: Write and call a function to return where to get the new stack. */
-//	LDR	r0, =stack_b_top
-/* Switch to the new stack by writing to PSP */
-//	MSR	PSP, r0
+ 	MRS	r0, PSP
+ 	SUB	r0, r0, #32
+	MSR	PSP, r0
+	STR r4, [r0, #4]
+	STR r5, [r0, #8]
+	STR r6, [r0, #12]
+	STR r7, [r0, #16]
+	STR r8, [r0, #20]
+	STR r9, [r0, #24]
+	STR r10, [r0, #28]
+	STR r11, [r0, #32]
+
+/* TODO: Save the old PSP somewhere. */
+/* TODO: Write and call a function to return where to get the new stack and get rid of this code. */
+	LDR	r2, =stack_b_top
+	LDR r1, [r2]
+	SUB r1, r1, #64
+
 /* Re-pop the software exception stack frame in the new context. */
-//	POP {r4-r11}
+	ADD r1, r1, #32
+	LDR r4, [r1, #4]
+	LDR r5, [r1, #8]
+	LDR r6, [r1, #12]
+	LDR r7, [r1, #16]
+	LDR r8, [r1, #20]
+	LDR r9, [r1, #24]
+	LDR r10, [r1, #28]
+	LDR r11, [r1, #32]
+
+/* Switch to the new stack by writing to PSP */
+	MSR	PSP, r1
+
 /* Finally return to thread mode. TODO: Change this to a PendSV so that we don't fuck up other interupts. */
-//	LDR pc, =return_to_thread_val
+	LDR r2, =return_to_thread_val
+	LDR r1, [r2]
+	BX r1
+
+	.size	SysTick_Handler, .-SysTick_Handler
+
+
+.align 4
 return_to_thread_val:
 	.word 0xFFFFFFFD
 

@@ -40,14 +40,15 @@ static void thread_stack_init(int (*thread)(void), void* stack_top) {
 	esf[ESF_OFFSET_xPSR] = 0x01000000;
 
 	/* Now push the info for the software (i.e. the other registers) */
+	/* TODO: Fill these with 0's */
 	ssf[SSF_OFFSET_R4] = 0;
-	ssf[SSF_OFFSET_R5] = 0;
-	ssf[SSF_OFFSET_R6] = 0;
-	ssf[SSF_OFFSET_R7] = 0;
-	ssf[SSF_OFFSET_R8] = 0;
-	ssf[SSF_OFFSET_R9] = 0;
-	ssf[SSF_OFFSET_R10] = 0;
-	ssf[SSF_OFFSET_R11] = 0;
+	ssf[SSF_OFFSET_R5] = 1;
+	ssf[SSF_OFFSET_R6] = 2;
+	ssf[SSF_OFFSET_R7] = 3;
+	ssf[SSF_OFFSET_R8] = 4;
+	ssf[SSF_OFFSET_R9] = 5;
+	ssf[SSF_OFFSET_R10] = 6;
+	ssf[SSF_OFFSET_R11] = 7;
 }
 
 /*
