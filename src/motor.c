@@ -86,7 +86,7 @@ void motor_timers_init() {
  * 		Can be one of the following values
  * 		Motor1, Motor2, Motor3, Motor4
  * @param  s : Select the speed for the motor
- * 		Can be between 0 and 256
+ * 		Can be between 0 and 100
  */
 void motor_set(MotorEnum m, int duty) {
 	//MULT: preprocessor define -

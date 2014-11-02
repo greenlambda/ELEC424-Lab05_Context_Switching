@@ -2,8 +2,9 @@
 #define SYS_INIT_H_
 
 /*
- * MySystemInit is used to set default system initializations and configure system * clock to 72MHz.
-*/
+ * MySystemInit is used to set default system initializations and configure system
+ * clock to 72MHz.
+ */
 void init_system_clk(void);
 
 /*

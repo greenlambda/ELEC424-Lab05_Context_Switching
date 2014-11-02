@@ -16,7 +16,8 @@ LIBDIR = lib
 LINKER_SCRIPT = linker_script
 
 # These are all the local project source files
-SRCS = $(addprefix $(SRCDIR)/, systick_context_switcher.c sys_clk_init.c motor.c)
+SRCS = $(addprefix $(SRCDIR)/, systick_context_switcher.c sys_clk_init.c motor.c thread.c)
+SRCS_ASM = $(addprefix $(SRCDIR)/, context_switch.s)
 LIBS := $(LIBDIR)/libtasks.a
 ELF := $(BINDIR)/systick_context_switcher.elf
 
@@ -54,7 +55,7 @@ CFLAGS = -g -Wall -Wextra -Werror $(PROCESSOR) $(INCLUDE) $(STFLAGS) -Wl,--gc-se
 DEPGENFLAGS = -MMD -MP
 
 # Create the objects and dependencies based on the sources
-OBJS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRCS:.c=.o))
+OBJS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRCS:.c=.o) $(SRCS_ASM:.s=.o))
 DEPENDENCIES := $(STM_DEPS) $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRCS:.c=.d))
 
 # Build all relevant files and create .elf
@@ -69,10 +70,14 @@ $(STM_BUILD_DIR)/%.o: $(STM_LIB)/%.c
 	@mkdir -p $(patsubst %/,%,$(dir $@)) # Create necessary dirs in build
 	$(CC) $(DEPGENFLAGS) $(CFLAGS) -o $@ -c $<
 
+$(BUILDDIR)/%.o: $(SRCDIR)/%.s
+	@mkdir -p $(patsubst %/,%,$(dir $@)) # Create necessary dirs in build
+	$(CC) $(CFLAGS) -o $@ -c $<
+
 $(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(patsubst %/,%,$(dir $@)) # Create necessary dirs in build
 	$(CC) $(DEPGENFLAGS) $(CFLAGS) -o $@ -c $<
-
+	
 # Archive the STM object files into a library 
 $(STM_LIB_PKG): $(STM_OBJS) 
 	ar rcs $@ $^
