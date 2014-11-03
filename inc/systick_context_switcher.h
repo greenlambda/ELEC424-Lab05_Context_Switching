@@ -15,7 +15,7 @@
 
 /* 1ms SysTick Interrupt */
 #define SYSTICK_IN_FREQ			(AHB_FREQ/8)
-#define SYSTICK_FREQ			1
+#define SYSTICK_FREQ			1000
 #define SYSTICK_COUNT			(SYSTICK_IN_FREQ/SYSTICK_FREQ)
 
 /* Create a quick boolean type */

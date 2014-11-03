@@ -20,7 +20,7 @@ extern void ThreadExitReturn();
  * it jumps to the ThreadExitReturn, which switches to the main control loop taking
  * return values and cleaning up the thread.
  */
-static void thread_stack_init(int (*thread)(void), void* stack_top) {
+static void thread_stack_init(void (*thread)(void), void* stack_top) {
 	/* Figure out where the exception and software stack frames should be on the stack */
 	uint32_t* esf = (uint32_t*)stack_top - ESF_LEN_WORDS;
 	uint32_t* ssf = (uint32_t*)stack_top - (ESF_LEN_WORDS + SSF_LEN_WORDS);
@@ -53,7 +53,7 @@ static void thread_stack_init(int (*thread)(void), void* stack_top) {
 /*
  * Create a new thread using the given call function.
  */
-void thread_create(int (*thread)(void), void* stack_top) {
+void thread_create(void (*thread)(void), void* stack_top) {
 	thread_stack_init(thread, stack_top);
 }
 

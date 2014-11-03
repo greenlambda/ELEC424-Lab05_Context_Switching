@@ -58,6 +58,7 @@ ThreadExitReturn:
 
 /* TODO: Remove me! */
 .extern stack_b_top
+.extern thread_get_next_stack_top
 
 /*
  * The SysTick_Handler switches from one thread to another.
@@ -79,13 +80,13 @@ SysTick_Handler:
 	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
 // void* thread_get_next_stack_top(void* cur_stack_top);
-//	BL	thread_get_next_stack_top
+	BL	thread_get_next_stack_top
 
 /* TODO: Save the old PSP somewhere. */
 /* TODO: Write and call a function to return where to get the new stack and get rid of this code. */
-	LDR	r1, =stack_b_top
-	LDR r0, [r1]
-	SUB r0, r0, #64
+//	LDR	r1, =stack_b_top
+//	LDR r0, [r1]
+//	SUB r0, r0, #64
 
 /* Re-pop the software exception stack frame in the new context. */
 	LDMIA	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
