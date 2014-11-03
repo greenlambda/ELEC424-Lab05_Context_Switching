@@ -24,8 +24,6 @@
 .global		stack_switch
 stack_switch:
 	PUSH	{lr}
-/* -1 Is the defualt return value */
-	MOV.W	r4, #-1
 /* Set the top of the stack */
 	MSR	PSP, r1
 /*
@@ -35,12 +33,17 @@ stack_switch:
 	MRS	r2, CONTROL
 	ORR.W	r2, r2, #2
 	MSR	CONTROL, r2
+/* Turn on interupts. This starts the scheduler for systick. */
+	CPSIE I
 /* Call the function. This sets PC and LR. The function sets R0. */
 	BLX	r0
+
+
 /*
  * When thread ends, it should return here. Switch back the stack.
  * The function may have modified R0-R3. r0 is the return.
  */
+.thumb_func
 .global		ThreadExitReturn
 ThreadExitReturn:
 	MRS	r2, CONTROL
@@ -72,34 +75,23 @@ SysTick_Handler:
  	MRS	r0, PSP
  	SUB	r0, r0, #32
 	MSR	PSP, r0
-	STR r4, [r0, #4]
-	STR r5, [r0, #8]
-	STR r6, [r0, #12]
-	STR r7, [r0, #16]
-	STR r8, [r0, #20]
-	STR r9, [r0, #24]
-	STR r10, [r0, #28]
-	STR r11, [r0, #32]
+	ADD r0, r0, #32
+	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
+
+// void* thread_get_next_stack_top(void* cur_stack_top);
+	BL	thread_get_next_stack_top
 
 /* TODO: Save the old PSP somewhere. */
 /* TODO: Write and call a function to return where to get the new stack and get rid of this code. */
-	LDR	r2, =stack_b_top
-	LDR r1, [r2]
-	SUB r1, r1, #64
+	LDR	r1, =stack_b_top
+	LDR r0, [r1]
+	SUB r0, r0, #64
 
 /* Re-pop the software exception stack frame in the new context. */
-	ADD r1, r1, #32
-	LDR r4, [r1, #4]
-	LDR r5, [r1, #8]
-	LDR r6, [r1, #12]
-	LDR r7, [r1, #16]
-	LDR r8, [r1, #20]
-	LDR r9, [r1, #24]
-	LDR r10, [r1, #28]
-	LDR r11, [r1, #32]
+	LDMIA	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
 /* Switch to the new stack by writing to PSP */
-	MSR	PSP, r1
+	MSR	PSP, r0
 
 /* Finally return to thread mode. TODO: Change this to a PendSV so that we don't fuck up other interupts. */
 	LDR r2, =return_to_thread_val

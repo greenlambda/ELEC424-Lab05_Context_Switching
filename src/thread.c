@@ -22,8 +22,8 @@ extern void ThreadExitReturn();
  */
 static void thread_stack_init(int (*thread)(void), void* stack_top) {
 	/* Figure out where the exception and software stack frames should be on the stack */
-	uint32_t* esf = (uint32_t*)((uint8_t*)stack_top - ESF_LEN);
-	uint32_t* ssf = (uint32_t*)((uint8_t*)stack_top - ESF_LEN - SSF_LEN);
+	uint32_t* esf = (uint32_t*)stack_top - ESF_LEN_WORDS;
+	uint32_t* ssf = (uint32_t*)stack_top - (ESF_LEN_WORDS + SSF_LEN_WORDS);
 
 	/* Artificially push the information that would normally be pushed by hardware. */
 	/* Registers are all 0 */
@@ -40,15 +40,14 @@ static void thread_stack_init(int (*thread)(void), void* stack_top) {
 	esf[ESF_OFFSET_xPSR] = 0x01000000;
 
 	/* Now push the info for the software (i.e. the other registers) */
-	/* TODO: Fill these with 0's */
 	ssf[SSF_OFFSET_R4] = 0;
-	ssf[SSF_OFFSET_R5] = 1;
-	ssf[SSF_OFFSET_R6] = 2;
-	ssf[SSF_OFFSET_R7] = 3;
-	ssf[SSF_OFFSET_R8] = 4;
-	ssf[SSF_OFFSET_R9] = 5;
-	ssf[SSF_OFFSET_R10] = 6;
-	ssf[SSF_OFFSET_R11] = 7;
+	ssf[SSF_OFFSET_R5] = 0;
+	ssf[SSF_OFFSET_R6] = 0;
+	ssf[SSF_OFFSET_R7] = 0;
+	ssf[SSF_OFFSET_R8] = 0;
+	ssf[SSF_OFFSET_R9] = 0;
+	ssf[SSF_OFFSET_R10] = 0;
+	ssf[SSF_OFFSET_R11] = 0;
 }
 
 /*

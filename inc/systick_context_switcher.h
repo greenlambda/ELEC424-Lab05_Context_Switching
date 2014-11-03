@@ -24,25 +24,25 @@ typedef int boolean;
 #define FALSE	0
 
 /* Define the exception stack frame */
-#define ESF_LEN			32
-#define ESF_OFFSET_R0	0x00
-#define ESF_OFFSET_R1	0x04
-#define ESF_OFFSET_R2	0x08
-#define ESF_OFFSET_R3	0x0C
-#define ESF_OFFSET_R12	0x10
-#define ESF_OFFSET_LR	0x14
-#define ESF_OFFSET_PC	0x18
-#define ESF_OFFSET_xPSR	0x1C
+#define ESF_LEN_WORDS	8
+#define ESF_OFFSET_R0	0
+#define ESF_OFFSET_R1	1
+#define ESF_OFFSET_R2	2
+#define ESF_OFFSET_R3	3
+#define ESF_OFFSET_R12	4
+#define ESF_OFFSET_LR	5
+#define ESF_OFFSET_PC	6
+#define ESF_OFFSET_xPSR	7
 
-#define SSF_LEN			32
-#define SSF_OFFSET_R4	0x00
-#define SSF_OFFSET_R5	0x04
-#define SSF_OFFSET_R6	0x08
-#define SSF_OFFSET_R7	0x0C
-#define SSF_OFFSET_R8	0x10
-#define SSF_OFFSET_R9	0x14
-#define SSF_OFFSET_R10	0x18
-#define SSF_OFFSET_R11	0x1C
+#define SSF_LEN_WORDS	8
+#define SSF_OFFSET_R4	0
+#define SSF_OFFSET_R5	1
+#define SSF_OFFSET_R6	2
+#define SSF_OFFSET_R7	3
+#define SSF_OFFSET_R8	4
+#define SSF_OFFSET_R9	5
+#define SSF_OFFSET_R10	6
+#define SSF_OFFSET_R11	7
 
 typedef struct exception_stack_frame_s {
 	uint32_t R0;

@@ -25,7 +25,7 @@ uint8_t stack_a[STACK_LEN];
 uint8_t stack_b[STACK_LEN];
 uint8_t* stack_b_top = (stack_b + sizeof(stack_b));
 
-extern int stack_switch(int (*thread)(void), void* new_stack_top);
+extern int scheduler_init(int (*thread)(void), void* new_stack_top);
 
 /*
  * Initialize the SysTick interrupt for 1ms.
@@ -133,12 +133,10 @@ int main() {
 	/* Create the non-main thread. */
 	thread_create(blink_light_2, (stack_b + sizeof(stack_b)));
 
-	/* Turn on interrupts */
-	__enable_irq();
+	scheduler_init(blink_light, (stack_a + sizeof(stack_a)));
 
 	/* Loop. Forever. */
 	for (;;) {
-		stack_switch(blink_light, (stack_a + sizeof(stack_a)));
 	}
 }
 
