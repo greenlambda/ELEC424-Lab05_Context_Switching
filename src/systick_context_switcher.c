@@ -18,11 +18,13 @@
 #include <stddef.h>
 #include <sys/types.h>
 
+/* Here are the thread control blocks. */
+thread_control_block_t threads[2];
+
 /* These are the other stacks */
 #define STACK_LEN	2048
 uint8_t stack_a[STACK_LEN];
 uint8_t stack_b[STACK_LEN];
-uint8_t* stack_b_top = (stack_b + sizeof(stack_b));
 
 /*
  * Initialize the SysTick interrupt for 1ms.
@@ -44,8 +46,6 @@ void systick_init() {
 	/* Enable SysTick IRQ and SysTick Timer */
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 }
-
-thread_control_block_t threads[2];
 
 /*
  * Main function.  Initializes the GPIO, Timers, and

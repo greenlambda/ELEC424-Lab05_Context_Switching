@@ -57,7 +57,8 @@ ThreadExitReturn:
 
 
 /* uint32_t thread_get_next_stack_top(uint32_t thread_cur_stack) */
-.extern thread_get_next_stack_top
+.extern thread_tick
+.extern sp_temp_store
 
 /*
  * The SysTick_Handler switches from one thread to another.
@@ -78,6 +79,24 @@ SysTick_Handler:
 	ADD r0, r0, #32
 	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
+/*
+ * Store the PSP in a temporary location so that we can service other
+ * interupts and then use PendSV to finish the context switch.
+ */
+ 	LDR r1, =sp_temp_store
+ 	STR r0, [r1]
+
+/* TODO: Trigger PendSV here */
+/* Finish this interupt to service any other interupt that may have occured. */
+	BX lr
+	.size	SysTick_Handler, .-SysTick_Handler
+
+
+.thumb_func
+.global PendSV_Handler
+PendSV_Handler:
+/* TODO: Load the temporarily stored stack pointer into r0 */
+
 /* Get the next thread stack to switch to and save the current PSP. Both in r0 */
 	BL	thread_tick
 
@@ -94,7 +113,7 @@ SysTick_Handler:
 	LDR r2, =return_to_thread_val
 	LDR r1, [r2]
 	BX r1
-	.size	SysTick_Handler, .-SysTick_Handler
+	.size PendSV_Handler, .-PendSV_Handler
 
 .align 4
 return_to_thread_val:

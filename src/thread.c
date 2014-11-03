@@ -21,6 +21,7 @@ extern int scheduler_init(void (*thread_thread)(void), void* new_stack_top);
 /* Store info for the thread scheduler */
 thread_control_block_t* active_thread;
 dl_list_head_t ready_threads;
+uint32_t sp_temp_store;
 
 /*
  * Initialize a thread's stack so that when it is context switched to it will start the given
