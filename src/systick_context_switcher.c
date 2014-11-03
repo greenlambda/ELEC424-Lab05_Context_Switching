@@ -98,7 +98,7 @@ int blink_light_2() {
 	for (j = 0; j < 20; ++j) {
 		/* Toggle the green led */
 		if (greenLedState) {
-			motor_set(Motor1, 25);
+			motor_set(Motor1, 10);
 		} else {
 			motor_set(Motor1, 0);
 		}
@@ -115,16 +115,16 @@ int blink_light_2() {
 /*
  * test comment
  */
-void* thread_get_next_stack_top(void* thread_cur_stack)
-{
-	static void* next = stack_b;	//initially set to B to be reset to A
-
-	if (next == stack_b)
-		next = stack_a;
-	else
-		next = stack_b;
-	return next;
-}
+//void* thread_get_next_stack_top(void* thread_cur_stack)
+//{
+//	static void* next = stack_b;	//initially set to B to be reset to A
+//
+//	if (next == stack_b)
+//		next = stack_a;
+//	else
+//		next = stack_b;
+//	return next;
+//}
 
 
 
@@ -149,6 +149,7 @@ int main() {
 	/* Create the non-main thread. */
 	thread_create(blink_light_2, (stack_b + sizeof(stack_b)));
 
+	/* Start the scheduler. This starts the given thread and enables all interrupts. */
 	scheduler_init(blink_light, (stack_a + sizeof(stack_a)));
 
 	/* Loop. Forever. */

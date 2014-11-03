@@ -21,8 +21,8 @@
  * extern int stack_switch(int (*thread)(void), void* new_stack_top);
  */
 .thumb_func
-.global		stack_switch
-stack_switch:
+.global		scheduler_init
+scheduler_init:
 	PUSH	{lr}
 /* Set the top of the stack */
 	MSR	PSP, r1
@@ -53,7 +53,7 @@ ThreadExitReturn:
 /* Return to the function */
 	POP	{lr}
 	BX	lr
-	.size	stack_switch, .-stack_switch
+	.size	scheduler_init, .-scheduler_init
 
 
 /* TODO: Remove me! */
@@ -79,7 +79,7 @@ SysTick_Handler:
 	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
 // void* thread_get_next_stack_top(void* cur_stack_top);
-	BL	thread_get_next_stack_top
+//	BL	thread_get_next_stack_top
 
 /* TODO: Save the old PSP somewhere. */
 /* TODO: Write and call a function to return where to get the new stack and get rid of this code. */

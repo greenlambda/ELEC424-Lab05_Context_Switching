@@ -34,6 +34,7 @@ typedef int boolean;
 #define ESF_OFFSET_PC	6
 #define ESF_OFFSET_xPSR	7
 
+/* This is the software context stack frame */
 #define SSF_LEN_WORDS	8
 #define SSF_OFFSET_R4	0
 #define SSF_OFFSET_R5	1
@@ -43,18 +44,5 @@ typedef int boolean;
 #define SSF_OFFSET_R9	5
 #define SSF_OFFSET_R10	6
 #define SSF_OFFSET_R11	7
-
-typedef struct exception_stack_frame_s {
-	uint32_t R0;
-	uint32_t R1;
-	uint32_t R2;
-	uint32_t R3;
-	uint32_t R12;
-	uint32_t LR;
-	uint32_t PC;
-	uint32_t xPSR;
-} __attribute__((packed, aligned(4))) exception_stack_frame_t;
-
-/*  */
 
 #endif /* SYSTICK_CONTEXT_SWITCHER_H_ */
