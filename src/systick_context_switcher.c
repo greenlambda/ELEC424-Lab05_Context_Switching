@@ -113,17 +113,24 @@ int blink_light_2() {
 
 
 /*
- * test comment
+ * Get the stack pointer for the next stack to switch to
  */
 void* thread_get_next_stack_top(void* thread_cur_stack)
 {
-	static void* next = stack_b;	//initially set to B to be reset to A
+	static void* isStackA = 0;	//state variable
+	static void* pointerB, pointerA;
 
-	if (next == stack_b)
-		next = stack_a;
-	else
-		next = stack_b;
-	return next;
+	if (isStackA == 0)	//stack we are going to is B
+	{
+		isStackA = 1;	//next time, going to stack A
+		pointerA = thread_cur_stack;
+	}
+	else				//stack we are going to is A
+	{
+		isStackA = 0;
+		pointerB = thread_cur_stack;
+	}
+	return isStackA ? pointerB : pointerA;	//inverted because we flipped the state variable
 }
 
 
