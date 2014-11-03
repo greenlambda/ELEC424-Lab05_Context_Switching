@@ -113,6 +113,22 @@ int blink_light_2() {
 
 
 /*
+ * test comment
+ */
+void* thread_get_next_stack_top(void* thread_cur_stack)
+{
+	static void* next = stack_b;	//initially set to B to be reset to A
+
+	if (next == stack_b)
+		next = stack_a;
+	else
+		next = stack_b;
+	return next;
+}
+
+
+
+/*
  * Main function.  Initializes the GPIO, Timers, and
  */
 int main() {
