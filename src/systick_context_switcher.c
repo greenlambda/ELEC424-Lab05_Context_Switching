@@ -113,7 +113,7 @@ int blink_light_2() {
 
 
 /*
- *
+ * test comment
  */
 void* thread_get_next_stack_top(void* thread_cur_stack)
 {
