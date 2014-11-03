@@ -24,8 +24,6 @@ uint8_t stack_a[STACK_LEN];
 uint8_t stack_b[STACK_LEN];
 uint8_t* stack_b_top = (stack_b + sizeof(stack_b));
 
-extern int scheduler_init(void (*thread)(void), void* new_stack_top);
-
 /*
  * Initialize the SysTick interrupt for 1ms.
  */
@@ -47,27 +45,7 @@ void systick_init() {
 	SysTick->CTRL = SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 }
 
-/*
- * Get the stack pointer for the next stack to switch to
- */
-uint32_t pointer_b = (uint32_t)stack_b + sizeof(stack_b) - ((ESF_LEN_WORDS + SSF_LEN_WORDS)*4);
-uint32_t pointer_a;
-uint32_t thread_get_next_stack_top(uint32_t thread_cur_stack) {
-	static int is_stack_a = 0;	//state variable
-
-	/* Stack we are going to is B */
-	if (is_stack_a == 0) {
-		/* Next time, going to stack A */
-		is_stack_a = 1;
-		pointer_a = thread_cur_stack;
-	} else {
-		/* Stack we are going to is A */
-		is_stack_a = 0;
-		pointer_b = thread_cur_stack;
-	}
-	/* Inverted because we flipped the state variable */
-	return (uint32_t)(is_stack_a ? pointer_b : pointer_a);
-}
+thread_control_block_t threads[2];
 
 /*
  * Main function.  Initializes the GPIO, Timers, and
@@ -84,13 +62,16 @@ int main() {
 	/* Set up the SysTick for 1ms intervals */
 	systick_init();
 
+	/* Create the init thread. */
+	thread_create_init(&threads[0], task_blink_led, stack_a + STACK_LEN);
+
 	/* Create the non-main thread. */
-	thread_create(task_spin_motors, (stack_b + sizeof(stack_b)));
+	thread_create(&threads[1], task_spin_motors, stack_b + STACK_LEN);
 
-	/* Start the scheduler. This starts the given thread and enables all interrupts. */
-	scheduler_init(task_blink_led, (stack_a + sizeof(stack_a)));
+	/* Start the scheduler. This starts the init thread and enables all interrupts. */
+	thread_scheduler_start();
 
-	/* Loop. Forever. */
+	/* Loop. Forever. We should never get here. */
 	for (;;) {
 	}
 }

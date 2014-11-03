@@ -45,4 +45,9 @@ typedef int boolean;
 #define SSF_OFFSET_R10	6
 #define SSF_OFFSET_R11	7
 
+/* Manage arbitrary elements within a structure */
+#define GET_OFFSET(container, list) ((ssize_t)((uint8_t*)(list) - (uint8_t*)(container)))
+/* Gets the container of the given element */
+#define GET_CONTAINER(list, offset, type)	(list == NULL ? NULL : ((type)((uint8_t*)list - offset)))
+
 #endif /* SYSTICK_CONTEXT_SWITCHER_H_ */

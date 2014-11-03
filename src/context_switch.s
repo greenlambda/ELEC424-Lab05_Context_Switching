@@ -56,8 +56,7 @@ ThreadExitReturn:
 	.size	scheduler_init, .-scheduler_init
 
 
-/* TODO: Remove me! */
-.extern stack_b_top
+/* uint32_t thread_get_next_stack_top(uint32_t thread_cur_stack) */
 .extern thread_get_next_stack_top
 
 /*
@@ -71,7 +70,7 @@ ThreadExitReturn:
 SysTick_Handler:
 /*
  * We have just pushed all of the hardware exception stack frame, now push the software
- * exception stack frame.
+ * exception stack frame and adjust the PSP.
  */
  	MRS	r0, PSP
  	SUB	r0, r0, #32
@@ -79,14 +78,8 @@ SysTick_Handler:
 	ADD r0, r0, #32
 	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
-// void* thread_get_next_stack_top(void* cur_stack_top);
-	BL	thread_get_next_stack_top
-
-/* TODO: Save the old PSP somewhere. */
-/* TODO: Write and call a function to return where to get the new stack and get rid of this code. */
-//	LDR	r1, =stack_b_top
-//	LDR r0, [r1]
-//	SUB r0, r0, #64
+/* Get the next thread stack to switch to and save the current PSP. Both in r0 */
+	BL	thread_tick
 
 /* Re-pop the software exception stack frame in the new context. */
 	LDMIA	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
@@ -94,13 +87,14 @@ SysTick_Handler:
 /* Switch to the new stack by writing to PSP */
 	MSR	PSP, r0
 
-/* Finally return to thread mode. TODO: Change this to a PendSV so that we don't fuck up other interupts. */
+/*
+ * Finally return to thread mode. TODO: Change this to a PendSV so that we don't
+ * fuck up other interupts.
+ */
 	LDR r2, =return_to_thread_val
 	LDR r1, [r2]
 	BX r1
-
 	.size	SysTick_Handler, .-SysTick_Handler
-
 
 .align 4
 return_to_thread_val:
