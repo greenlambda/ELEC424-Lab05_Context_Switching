@@ -20,10 +20,12 @@ Q4. What is SysTick and PendSV?
 
 Q5. What context contents are saved during a context switch, by hardware or by 
     software?
+The registers are saved in a context switch.  Specifically, r0 r1 r2 r3 r12 LR PC xPSR are saved by the hardware.  r4 r5 r6 r7 r8 r9 r10 r11 are stored by software.  The registers saved by software are stacked after those saved by hardware.
 
 Part 2: 2
 
 Q6. Why? Why can't a C program conduct a context switch? 
+A C program cannot conduct a context switch because the core registers must be manipulated directly to save and load contexts.  C does not have the capability to switch stack pointers in this manner.
 
 Q7. What are the potential problems to use SysTick to conduct context switching?
 
