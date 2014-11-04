@@ -61,6 +61,7 @@ int main() {
 
 	/* Set up the SysTick for 1ms intervals */
 	systick_init();
+	/* TODO: Set prio of pendSV to lowest */
 
 	/* Create the init thread. */
 	thread_create_init(&threads[0], task_blink_led, stack_a + STACK_LEN);
