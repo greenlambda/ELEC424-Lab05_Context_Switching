@@ -69,6 +69,9 @@ ThreadExitReturn:
 .thumb_func
 .global SysTick_Handler
 SysTick_Handler:
+/* Saving state is a critical section. */
+	CPSID	i
+
 /*
  * We have just pushed all of the hardware exception stack frame, now push the software
  * exception stack frame and adjust the PSP.
@@ -86,7 +89,15 @@ SysTick_Handler:
  	LDR r1, =sp_temp_store
  	STR r0, [r1]
 
-/* TODO: Trigger PendSV here */
+/* Trigger PendSV */
+	LDR r1, =0xE000ED04
+	LDR r0, [r1]
+	ORR r0, #0x10000000
+	STR r0, [r1]
+
+/* End the critical section */
+	CPSIE	i
+
 /* Finish this interupt to service any other interupt that may have occured. */
 	BX lr
 	.size	SysTick_Handler, .-SysTick_Handler
@@ -95,7 +106,12 @@ SysTick_Handler:
 .thumb_func
 .global PendSV_Handler
 PendSV_Handler:
-/* TODO: Load the temporarily stored stack pointer into r0 */
+/* Figuring out which thread to switch to and which stack is a critical section. */
+	CPSID	i
+
+/* Load the temporarily stored stack pointer into r0 */
+	LDR r1, =sp_temp_store
+	LDR r0, [r1]
 
 /* Get the next thread stack to switch to and save the current PSP. Both in r0 */
 	BL	thread_tick
@@ -106,9 +122,12 @@ PendSV_Handler:
 /* Switch to the new stack by writing to PSP */
 	MSR	PSP, r0
 
+/* End critical section. Everything past here is read only. */
+	CPSIE	i
+
 /*
- * Finally return to thread mode. TODO: Change this to a PendSV so that we don't
- * fuck up other interupts.
+ * Finally return to thread mode. PendSV is the lowest priority, so we don't
+ * need to.
  */
 	LDR r2, =return_to_thread_val
 	LDR r1, [r2]

@@ -11,6 +11,8 @@
 
 #include "doubly_linked_list.h"
 
+#include "core_cm3.h"
+
 #include <stdint.h>
 
 /* The thread return place in inline assembly */
