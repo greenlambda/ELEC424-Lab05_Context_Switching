@@ -1,16 +1,20 @@
 Lab05: Context Switching
-<PUT NAMES HERE>
+Jeremy Hunt
+Christopher Buck
 
 Part 1: 5
 
 Q1. How many timers do you use in lab4? Is there any difference if you use 1 
     timer and 2 timers for scheduling? 
+In lab4, we use 4 timers in total, 2 of which are used for scheduling.  **difference between using 1 and 2 timers**
 
 Q2. Suppose there are task1 and task2, task1 has higher priority than task2, by
     manual scheduling what will happen if task1 needs to be executed while task2
     is running?
+If both timers were of equal priority, then task1 would need to wait for task2 to complete first.  However, in our solution, we used timer1 for higher priority tasks which has the capacity to interrupt lower priority tasks running from the other timer.  Thus, task1 would interrupt task2, execute, and return control back to task2.
 
 Q3. What is MSP and PSP, what are they used for? 
+MSP is the Main Stack Pointer and PSP is the Process Stack Pointer.  They are used to seperate stacks for different tasks.  The main stack is used for handling exceptions and interrupts and the process stacks are used to execute specific tasks or threads.
 
 Q4. What is SysTick and PendSV? 
 
