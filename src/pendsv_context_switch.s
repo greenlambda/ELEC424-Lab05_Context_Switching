@@ -82,13 +82,6 @@ SysTick_Handler:
 	ADD r0, r0, #32
 	STMDB	r0!, {r4, r5, r6, r7, r8, r9, r10, r11}
 
-/*
- * Store the PSP in a temporary location so that we can service other
- * interupts and then use PendSV to finish the context switch.
- */
- 	LDR r1, =sp_temp_store
- 	STR r0, [r1]
-
 /* Trigger PendSV */
 	LDR r1, =0xE000ED04
 	LDR r0, [r1]
@@ -109,9 +102,8 @@ PendSV_Handler:
 /* Figuring out which thread to switch to and which stack is a critical section. */
 	CPSID	i
 
-/* Load the temporarily stored stack pointer into r0 */
-	LDR r1, =sp_temp_store
-	LDR r0, [r1]
+/* Load the current stack pointer into r0 */
+	MRS	r0, PSP
 
 /* Get the next thread stack to switch to and save the current PSP. Both in r0 */
 	BL	thread_tick
