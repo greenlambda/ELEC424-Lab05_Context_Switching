@@ -5,7 +5,7 @@
  * Description: A simple task scheduler for varying priority tasks.
  */
 
-#include "systick_context_switcher.h"
+#include "pendsv_context_switcher.h"
 
 #include "thread.h"
 #include "sys_init.h"

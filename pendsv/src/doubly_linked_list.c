@@ -7,7 +7,7 @@
 
 #include "doubly_linked_list.h"
 
-#include "systick_context_switcher.h"
+#include "pendsv_context_switcher.h"
 
 #include <stdint.h>
 #include <stddef.h>

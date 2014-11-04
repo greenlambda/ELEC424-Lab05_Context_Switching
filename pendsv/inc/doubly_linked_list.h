@@ -7,7 +7,7 @@
 #ifndef DOUBLY_LINKED_LIST_H_
 #define DOUBLY_LINKED_LIST_H_
 
-#include "systick_context_switcher.h"
+#include "pendsv_context_switcher.h"
 
 /*
  * A doubly linked list is a linked structure made of these.
