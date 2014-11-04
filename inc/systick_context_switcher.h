@@ -7,7 +7,9 @@
 #ifndef SYSTICK_CONTEXT_SWITCHER_H_
 #define SYSTICK_CONTEXT_SWITCHER_H_
 
-#include <sys/types.h>
+#include "stm32f10x.h"
+
+#include <stdint.h>
 
 #define AHB_FREQ				72000000
 #define APB1_FREQ				(AHB_FREQ/2)
@@ -17,6 +19,11 @@
 #define SYSTICK_IN_FREQ			(AHB_FREQ/8)
 #define SYSTICK_FREQ			1000
 #define SYSTICK_COUNT			(SYSTICK_IN_FREQ/SYSTICK_FREQ)
+/* The SysTick priority should be quite prioritize */
+#define SYSTICK_PRIO			(0)
+
+/* Bottom half of context switcher. */
+#define PENDSV_PRIO				((1 << __NVIC_PRIO_BITS) - 1)
 
 /* Create a quick boolean type */
 typedef int boolean;
@@ -45,8 +52,11 @@ typedef int boolean;
 #define SSF_OFFSET_R10	6
 #define SSF_OFFSET_R11	7
 
+/* Define NULL */
+#define NULL ((void*)0)
+
 /* Manage arbitrary elements within a structure */
-#define GET_OFFSET(container, list) ((ssize_t)((uint8_t*)(list) - (uint8_t*)(container)))
+#define GET_OFFSET(container, list) ((int32_t)((uint8_t*)(list) - (uint8_t*)(container)))
 /* Gets the container of the given element */
 #define GET_CONTAINER(list, offset, type)	(list == NULL ? NULL : ((type)((uint8_t*)list - offset)))
 

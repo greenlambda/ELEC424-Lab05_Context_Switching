@@ -40,7 +40,7 @@ void systick_init() {
 	/* Set reload register */
 	SysTick->LOAD = (SYSTICK_COUNT & SysTick_LOAD_RELOAD_Msk) - 1;
 	/* Set Priority for Cortex-M0 System Interrupts */
-	NVIC_SetPriority(SysTick_IRQn, (1 << __NVIC_PRIO_BITS) - 1);
+	NVIC_SetPriority(SysTick_IRQn, SYSTICK_PRIO);
 	/* Load the SysTick Counter Value */
 	SysTick->VAL = 0;
 	/* Enable SysTick IRQ and SysTick Timer */
@@ -61,7 +61,9 @@ int main() {
 
 	/* Set up the SysTick for 1ms intervals */
 	systick_init();
-	/* TODO: Set prio of pendSV to lowest */
+
+	/* Set the prio of PendSV to the lowest priority possible */
+	NVIC_SetPriority(PendSV_IRQn, PENDSV_PRIO);
 
 	/* Create the init thread. */
 	thread_create_init(&threads[0], task_blink_led, stack_a + STACK_LEN);

@@ -5,13 +5,13 @@
  *      Author: Jeremy Hunt and Christopher Buck
  */
 
-#include <stdint.h>
-#include <stddef.h>
-#include <sys/types.h>
+#include "doubly_linked_list.h"
 
 #include "systick_context_switcher.h"
 
-#include "doubly_linked_list.h"
+#include <stdint.h>
+#include <stddef.h>
+
 
 /*
  * In this implementation of a doubly linked list, the head of the list is an element in the

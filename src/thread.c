@@ -105,7 +105,7 @@ void thread_scheduler_start() {
  * pointer and returns the stack pointer to switch to. If no switch is to
  * take place, it should return the current stack pointer.
  */
-static const ssize_t sched_elem_offset = GET_OFFSET(active_thread, &(active_thread->sched_elem));
+static const int32_t sched_elem_offset = GET_OFFSET(active_thread, &(active_thread->sched_elem));
 void* thread_tick(void* sp) {
 	/* Only switch every 5000 ticks. 5s */
 	static int tick_count = 0;

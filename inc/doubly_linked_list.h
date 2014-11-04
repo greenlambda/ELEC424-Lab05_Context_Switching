@@ -9,8 +9,6 @@
 
 #include "systick_context_switcher.h"
 
-#include <sys/types.h>
-
 /*
  * A doubly linked list is a linked structure made of these.
  */
