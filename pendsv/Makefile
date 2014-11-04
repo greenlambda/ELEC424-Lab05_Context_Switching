@@ -16,8 +16,8 @@ LIBDIR = lib
 LINKER_SCRIPT = linker_script
 
 # These are all the local project source files
-SRCS = $(addprefix $(SRCDIR)/, systick_context_switcher.c thread.c doubly_linked_list.c)
-SRCS_ASM = $(addprefix $(SRCDIR)/, context_switch.s)
+SRCS = $(addprefix $(SRCDIR)/, pendsv_context_switcher.c thread.c doubly_linked_list.c)
+SRCS_ASM = $(addprefix $(SRCDIR)/, pendsv_context_switch.s)
 LIBS := $(LIBDIR)/libtasks.a
 ELF := $(BINDIR)/systick_context_switcher.elf
 
