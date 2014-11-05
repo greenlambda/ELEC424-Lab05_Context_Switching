@@ -106,29 +106,39 @@ void thread_scheduler_start() {
  * take place, it should return the current stack pointer.
  */
 static const int32_t sched_elem_offset = GET_OFFSET(active_thread, &(active_thread->sched_elem));
-void* thread_tick(void* sp) {
-	/* Only switch every 5000 ticks. 5s */
+void* thread_switch_info(void* sp) {
+	/* Context switch. Use the active and ready queues. */
+	thread_control_block_t* next_thread = GET_CONTAINER(ready_threads.next, sched_elem_offset, thread_control_block_t*);
+	dl_list_remove_first(&ready_threads);
+
+	/* Update the active thread's stack pointer */
+	active_thread->sp = sp;
+
+	/* Put the active thread on the ready_thread list. */
+	dl_list_append(&(active_thread->sched_elem), &ready_threads);
+
+	/* Make the next thread the active thread */
+	active_thread = next_thread;
+
+	/* Switch to the new active thread */
+	return active_thread->sp;
+}
+
+
+/*
+ * Handle the SysTicks; just set PendSV
+ */
+void SysTick_Handler() {
 	static int tick_count = 0;
+	/* Only switch every 5000 ms */
 	if (tick_count < 5000) {
 		tick_count++;
-		return sp;
-	} else {
+	}
+	else {
+		/* Set the PendSV */
+		*((uint32_t*)0xE000ED04) |= 0x10000000;
+
+		/* Reset the tick count */
 		tick_count = 0;
-
-		/* Context switch. Use the active and ready queues. */
-		thread_control_block_t* next_thread = GET_CONTAINER(ready_threads.next, sched_elem_offset, thread_control_block_t*);
-		dl_list_remove_first(&ready_threads);
-
-		/* Update the active thread's stack pointer */
-		active_thread->sp = sp;
-
-		/* Put the active thread on the ready_thread list. */
-		dl_list_append(&(active_thread->sched_elem), &ready_threads);
-
-		/* Make the next thread the active thread */
-		active_thread = next_thread;
-
-		/* Switch to the new active thread */
-		return active_thread->sp;
 	}
 }
