@@ -137,7 +137,7 @@ void SysTick_Handler() {
 		tick_count++;
 	} else {
 		/* Set the PendSV */
-		*((uint32_t*) 0xE000ED04) |= 0x10000000;
+		NVIC_ICSR |= NVIC_ISCR_PENDSVSET;
 
 		/* Reset the tick count */
 		tick_count = 0;

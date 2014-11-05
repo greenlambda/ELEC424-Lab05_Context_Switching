@@ -24,6 +24,9 @@
 
 /* Bottom half of context switcher. */
 #define PENDSV_PRIO				((1 << __NVIC_PRIO_BITS) - 1)
+#define NVIC_ICSR				(*((uint32_t*) 0xE000ED04))
+#define NVIC_ISCR_PENDSVSET 	(0x10000000)
+
 
 /* Create a quick boolean type */
 typedef int boolean;
