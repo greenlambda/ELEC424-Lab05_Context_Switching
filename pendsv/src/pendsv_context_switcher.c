@@ -75,7 +75,6 @@ int main() {
 	thread_scheduler_start();
 
 	/* Loop. Forever. We should never get here. */
-	for (;;) {
-	}
+	for (;;) {}
 }
 

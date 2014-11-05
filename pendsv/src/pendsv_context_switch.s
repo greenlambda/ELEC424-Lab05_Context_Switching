@@ -49,17 +49,15 @@ ThreadExitReturn:
 	MRS	r2, CONTROL
 	BIC.W	r2, r2, #2
 	MSR	CONTROL, r2
-/* We are now back to the MSR stack. */
+/* We are now back to the MSP stack. */
 /* Return to the function */
 	POP	{lr}
 	BX	lr
 	.size	scheduler_init, .-scheduler_init
 
 
-/* uint32_t thread_get_next_stack_top(uint32_t thread_cur_stack) */
-.extern thread_tick
-.extern sp_temp_store
-
+/* uint32_t thread_switch_info(uint32_t thread_cur_stack) */
+.extern thread_switch_info
 
 .thumb_func
 .global PendSV_Handler

@@ -31,10 +31,11 @@ uint32_t sp_temp_store;
  * it jumps to the ThreadExitReturn, which switches to the main control loop taking
  * return values and cleaning up the thread.
  */
-static void thread_stack_init(thread_control_block_t* thread, void (*thread_func)(void), void* stack_top) {
+static void thread_stack_init(thread_control_block_t* thread, void (*thread_func)(void),
+		void* stack_top) {
 	/* Figure out where the exception and software stack frames should be on the stack */
-	uint32_t* esf = (uint32_t*)stack_top - ESF_LEN_WORDS;
-	uint32_t* ssf = (uint32_t*)stack_top - (ESF_LEN_WORDS + SSF_LEN_WORDS);
+	uint32_t* esf = (uint32_t*) stack_top - ESF_LEN_WORDS;
+	uint32_t* ssf = (uint32_t*) stack_top - (ESF_LEN_WORDS + SSF_LEN_WORDS);
 
 	/* Artificially push the information that would normally be pushed by hardware. */
 	/* Registers are all 0 */
@@ -44,10 +45,10 @@ static void thread_stack_init(thread_control_block_t* thread, void (*thread_func
 	esf[ESF_OFFSET_R3] = 0;
 	esf[ESF_OFFSET_R12] = 0;
 	/* The thread should return to ThreadExitReturn on exit */
-	esf[ESF_OFFSET_LR] = (uint32_t)(&ThreadExitReturn);
+	esf[ESF_OFFSET_LR] = (uint32_t) (&ThreadExitReturn);
 	/* The thread should start at the given handler */
-	esf[ESF_OFFSET_PC] = (uint32_t)(thread_func);
-	/* This is the reset value of the PSR  TODO: Should this be something else? */
+	esf[ESF_OFFSET_PC] = (uint32_t) (thread_func);
+	/* This is the reset value of the PSR */
 	esf[ESF_OFFSET_xPSR] = 0x01000000;
 
 	/* Now push the info for the software (i.e. the other registers) */
@@ -64,7 +65,7 @@ static void thread_stack_init(thread_control_block_t* thread, void (*thread_func
 	 * Finally, store the stack pointer into the tcb.
 	 * Since it hasn't started yet, this is the end of the ssf.
 	 */
-	thread->sp = (void*)ssf;
+	thread->sp = (void*) ssf;
 }
 
 /*
@@ -82,7 +83,8 @@ void thread_create(thread_control_block_t* thread, void (*thread_func)(void), vo
  */
 static thread_control_block_t* init_thread;
 static void (*init_thread_func)(void);
-void thread_create_init(thread_control_block_t* first_thread, void (*thread_func)(void), void* stack_top) {
+void thread_create_init(thread_control_block_t* first_thread, void (*thread_func)(void),
+		void* stack_top) {
 	/* Init the ready list. */
 	dl_list_init(&ready_threads);
 	/* Cache the values for later */
@@ -108,7 +110,8 @@ void thread_scheduler_start() {
 static const int32_t sched_elem_offset = GET_OFFSET(active_thread, &(active_thread->sched_elem));
 void* thread_switch_info(void* sp) {
 	/* Context switch. Use the active and ready queues. */
-	thread_control_block_t* next_thread = GET_CONTAINER(ready_threads.next, sched_elem_offset, thread_control_block_t*);
+	thread_control_block_t* next_thread = GET_CONTAINER(ready_threads.next, sched_elem_offset,
+			thread_control_block_t*);
 	dl_list_remove_first(&ready_threads);
 
 	/* Update the active thread's stack pointer */
@@ -124,7 +127,6 @@ void* thread_switch_info(void* sp) {
 	return active_thread->sp;
 }
 
-
 /*
  * Handle the SysTicks; set PendSV every 5 seconds
  */
@@ -133,10 +135,9 @@ void SysTick_Handler() {
 	/* Only switch every 5000 ms */
 	if (tick_count < 5000) {
 		tick_count++;
-	}
-	else {
+	} else {
 		/* Set the PendSV */
-		*((uint32_t*)0xE000ED04) |= 0x10000000;
+		*((uint32_t*) 0xE000ED04) |= 0x10000000;
 
 		/* Reset the tick count */
 		tick_count = 0;
