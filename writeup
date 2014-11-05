@@ -6,41 +6,133 @@ Part 1: 5
 
 Q1. How many timers do you use in lab4? Is there any difference if you use 1 
     timer and 2 timers for scheduling? 
-In lab4, we use 4 timers in total, 2 of which are used for scheduling.  **difference between using 1 and 2 timers**
+In lab4, we use 4 timers in total, 2 of which are used for scheduling. The
+use of two timers allows the low priority task which takes a long time to 
+run to be interrupted by the high priority tasks, which do not take a
+significant amount of time. The use of interrupts allows the low priority
+task to be resumed. If only one timer was used, the long, low priority task
+could block the short high priority tasks, causing a priority inversion.
+
 
 Q2. Suppose there are task1 and task2, task1 has higher priority than task2, by
     manual scheduling what will happen if task1 needs to be executed while task2
     is running?
-If both timers were of equal priority, then task1 would need to wait for task2 to complete first.  However, in our solution, we used timer1 for higher priority tasks which has the capacity to interrupt lower priority tasks running from the other timer.  Thus, task1 would interrupt task2, execute, and return control back to task2.
+If both timers were of equal priority, then task1 would need to wait for task2
+to complete first. However, in our solution, we used timer1 for higher
+priority tasks which has the capacity to interrupt lower priority tasks
+running from the other timer. Thus, task1 would interrupt task2, execute, and
+return control back to task2.
+
 
 Q3. What is MSP and PSP, what are they used for? 
-MSP is the Main Stack Pointer and PSP is the Process Stack Pointer.  They are used to seperate stacks for different tasks.  The main stack is used for handling exceptions and interrupts and the process stacks are used to execute specific tasks or threads.
+MSP is the Main Stack Pointer and PSP is the Process Stack Pointer. They are
+the two banked versions of the Stack Pointer (r13). The main stack is used
+for handling exceptions and interrupts and the process stacks are used to
+execute specific tasks or threads. When an interrupt occurs the hardware
+automatically switches in the MSP into r13, otherwise the register that is
+switched in to r13 is determined by a bit in the CONTROL register.
 
-Q4. What is SysTick and PendSV? 
+
+Q4. What is SysTick and PendSV?
+SysTick and PendSV are both core interrupts present in all ARM Cortex-M3
+processors. They are generally used to implement context switching and 
+time sharing in threaded operating systems on these processors. SysTick is
+a periodic, timer generated interrupt which allows the operating system to
+keep track of time and time share thread execution. PendSV is a purely
+software generated interrupt (i.e. it can only be trigged by software) that
+is normally set as the lowest priority interrupt in the system. It is used to
+perform the actual context switching for the reasons stated in the questions
+below.
+
 
 Q5. What context contents are saved during a context switch, by hardware or by 
     software?
-The registers are saved in a context switch.  Specifically, r0 r1 r2 r3 r12 LR PC xPSR are saved by the hardware.  r4 r5 r6 r7 r8 r9 r10 r11 are stored by software.  The registers saved by software are stacked after those saved by hardware.
+The registers and processor states are saved in a context switch. 
+Specifically, r0 r1 r2 r3 r12 LR PC xPSR are saved by the hardware interrupt
+controller. r4 r5 r6 r7 r8 r9 r10 r11 are stored by software on the stack,
+directly after the exception stack frame (in our implementation). Finally, the
+process stack pointer PSP must be stored in a separate globally visible
+location (in our implementation we store the threads' stack pointers in
+the .bss section).
+
 
 Part 2: 2
 
 Q6. Why? Why can't a C program conduct a context switch? 
-A C program cannot conduct a context switch because the core registers must be manipulated directly to save and load contexts.  C does not have the capability to switch stack pointers in this manner.
+A C program cannot conduct a context switch because the core registers must
+be manipulated directly to save and load contexts. C does not have the
+ability to directly manipulate registers, status registers, the program 
+counter or the stack pointer, all of which are needed to fully save the state
+of a thread.
+
 
 Q7. What are the potential problems to use SysTick to conduct context switching?
+A potential problem of using SysTick to conduct the context switching is that an
+interrupt that is lower priority than SysTick could be interrupted by SysTick.
+SysTick saves the CURRENT registers and state to the process stack, and always
+returns to thread control at the end. If we are in a interrupt before SysTick
+context switches, the wrong registers will be saved on the wrong stack and the
+interrupt will never finish executing. If SysTick is set to the lowest priority
+in order to fix this, the system time will fail to be updated correctly and
+the scheduler may be badly out of sync.
+
+Q7B. If the tasks are implemented with time interrupt for mode changing and
+     context switching is invoked while the interrupt service routine is
+     being handled, what will happen?
+If the task is implemented with interrupts for timing, the low priority timer
+interrupt could be interrupted by SysTick. SysTick saves the CURRENT registers
+and state to the process stack, and always returns to thread control at the
+end. If we are in a interrupt before SysTick context switches, the wrong
+registers will be saved on the wrong stack and the interrupt will never
+finish executing. If SysTick is set to the lowest priority in order to fix
+this, the system time will fail to be updated correctly and the scheduler may
+be badly out of sync.
+
 
 Part 3: 3
 
 Q8. What are the advantages of PendSV over SysTick to invoke a context switching? 
+Using PendSV instead of SysTick to perform the context switch allows us to
+separate the two goals of SysTick:
+1. To update the scheduler and determine if we need to time share context switch.
+2. To actually perform the context switch.
+
+This allows us to keep the scheduler and system time up to date without
+wrecking other interrupts with a high priority interrupt by always returns
+to threaded execution mode. The SysTick interrupt can be set to a high priority
+level while the PendSV interrupt can be set to the lowest priority level. In
+addition, multiple other interrupts (e.g. SVC) can trigger PendSV for a
+context switch.
+
 
 Q9. Think about how you can make the scheduling easier than manual scheduling by 
-    doing a context switching? 
+    doing a context switching?
+With context switching, an unlimited number of threads can time share the same
+processor in a way that looks like all are running at the same time (if they
+switch fast enough). In addition, priorities can be implemented to give finner
+control over which threads are running in an arbitrary fashion. If preemptive
+context switching is enabled, a low priority thread can be arbitrarily switched
+away from when a high priority thread becomes unblocked (i.e. able to run) or
+has new data to execute on. Because the scheduler is also written in software,
+it can also implement a better measure of "fairness" in the execution of the
+thread.s
+
 
 Q10. What would you do to improve your code to add priorities for each tasks?
+In order to add priorities for each task/thread, we would change the current
+FIFO scheduler queues into FIFO priority queues (threads with the same
+priority would be scheduled in FIFO order). There would be an active thread,
+a ready FIFO priority queue of threads that can run, but are not currently
+running, sorted by the priority of the threads, and a list of blocked threads.
+By always running the highest priority thread on the ready queue, lower
+priority threads cannot run unless all high priority threads are blocked 
+(e.g. sleeping or doing i/o).
+
 
 Contribution
 
-Indicate the percentage work contributed by each partner below (should add up to 100%). Needless to say, replace PARTNER1/2 with names.
+Indicate the percentage work contributed by each partner below (should add
+up to 100%). Needless to say, replace PARTNER1/2 with names.
 
-<PARTNER1>: 
-<PARTNER2>: 
+Jeremy Hunt: 50%
+Christopher Buck: 50% 
