@@ -19,7 +19,7 @@ LINKER_SCRIPT = linker_script
 SRCS = $(addprefix $(SRCDIR)/, pendsv_context_switcher.c thread.c doubly_linked_list.c)
 SRCS_ASM = $(addprefix $(SRCDIR)/, pendsv_context_switch.s)
 LIBS := $(LIBDIR)/libtasks.a
-ELF := $(BINDIR)/systick_context_switcher.elf
+ELF := $(BINDIR)/pendsv_context_switcher.elf
 
 # Compiler
 CC = arm-none-eabi-gcc
