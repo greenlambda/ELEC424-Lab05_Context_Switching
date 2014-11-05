@@ -109,7 +109,7 @@ Q9. Think about how you can make the scheduling easier than manual scheduling by
     doing a context switching?
 With context switching, an unlimited number of threads can time share the same
 processor in a way that looks like all are running at the same time (if they
-switch fast enough). In addition, priorities can be implemented to give finner
+switch fast enough). In addition, priorities can be implemented to give finer
 control over which threads are running in an arbitrary fashion. If preemptive
 context switching is enabled, a low priority thread can be arbitrarily switched
 away from when a high priority thread becomes unblocked (i.e. able to run) or
