@@ -126,7 +126,7 @@ void* thread_switch_info(void* sp) {
 
 
 /*
- * Handle the SysTicks; just set PendSV
+ * Handle the SysTicks; set PendSV every 5 seconds
  */
 void SysTick_Handler() {
 	static int tick_count = 0;
